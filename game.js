@@ -4,24 +4,24 @@ sprites.src = 'frogger_sprites.png';
 ctx = 0;
 
 // Dynamic Objects in game mode.
-mlogs = new Object();
+middlesizelogs = new Object();
 turtles2nos = new Object();
-llogs = new Object();
-slogs = new Object();
+largelogs = new Object();
+smallLogs = new Object();
 turtles3nos = new Object();
 semis = new Object();
 racecars = new Object();
-pinkcars = new Object();
+pinkracecars = new Object();
 tractors = new Object();
-yellowcars = new Object();
+yellowracecars = new Object();
 frog = new Object();
 fly = new Object();
 
 lanes = [];
 slots = [];
 turtles = [turtles2nos, turtles3nos]
-cars = [semis, racecars, pinkcars, tractors, yellowcars];
-logs = [mlogs, llogs, slogs];
+cars = [semis, racecars, pinkracecars, tractors, yellowracecars];
+logs = [middlesizelogs, largelogs, smallLogs];
 
 // Objects/game Functionality.
 board = new Object();
@@ -41,7 +41,7 @@ speed = 1;
 function start_game() {
     canvas = document.getElementById('game');
 
-    // Check if browser supports canvas
+    // Check that browser supports game
     if (canvas.getContext) {
         ctx = canvas.getContext('2d');
 
@@ -54,21 +54,23 @@ function start_game() {
 
         setInterval(function() { move_cars_logs_turtles(speed) }, 60);
         setInterval(update_time, 1000);
-        setInterval(generate_rndm_nums, 3000);
-        setInterval(check_frog_pinned, 1);
+        setInterval(generate_random_nums, 3000);
+        setInterval(check_frog_pinnedmovewith, 1);
         setInterval(game_loop, 60);
-    } else { alert('Sorry, browser not supported!'); }
+    } else { alert('Browser not supported!'); }
 }
 
-// Loops through game stages.
+
+// Loops through the game stages.
 function game_loop() {
-    // If frog makes it across safely
-    if (frog.lane == 0 && is_safe_cross()) {
+
+    // When frog makes it across safely
+    if (frog.lane == 0 && is_safe_across()) {
         crossed_safely();
     }
 
     // If frog dies
-    if (is_collision() || is_in_water() || is_out_of_bounds() || is_out_of_time() || !is_safe_cross()) {
+    if (is_collision() || is_in_water() || is_out_of_bounds() || is_out_of_time() || !is_safe_across()) {
         lives--;
         reset_frog();
     }
@@ -79,13 +81,15 @@ function game_loop() {
     }
 }
 
-// Generates a random number b/w 1-10 and picks random slot b/w 1-5.
-function generate_rndm_nums() {
+// Generates a random number from 1-10 and picks random slot b/w 1-5.
+function generate_random_nums() {
     rndmslot = Math.floor(Math.random() * 101) % 5;
     rndmnum = Math.floor(Math.random() * 11);
 }
 
-/* Returns true if the 40 seconds has passed and the player has not moved frog to an empty slot */
+
+/* Returns true if 40 seconds passes and 
+the player has not moved frog to an empty slot */
 function is_out_of_time() {
     if (time.timer == time.max) {
         return 1;
@@ -93,7 +97,7 @@ function is_out_of_time() {
     return 0;
 }
 
-// Updates score and resets frog to start position.
+// Updates score and resets frog to original position.
 function crossed_safely() {
     safefrogs++;
     frog.lane = 12;
@@ -112,8 +116,8 @@ function crossed_safely() {
     for (j in lanes) {
         lanes[j].ispassed = 0;
     }
-    if (is_ate_fly()) {
-        frog.is_ate_fly = 0;
+    if (is_get_fly()) {
+        frog.is_get_fly = 0;
         score += 200;
     }
     check_for_10K();
@@ -141,6 +145,7 @@ function reset_frog() {
     }, 500);
 }
 
+
 // Restarts Game
 function game_over() {
     objspeed = 0;
@@ -153,7 +158,7 @@ function game_over() {
         score = 0;
         level = 1;
         speed = 1;
-        lives = 5;
+        lives = 4;
         time.x = 235;
         time.w = 120;
         time.isactive = 1;
@@ -161,7 +166,7 @@ function game_over() {
 }
 
 // Returns true if frog ate a fly
-function is_ate_fly() {
+function is_get_fly() {
     if (slots.lastfilled == fly.slot) {
         return 1;
     }
@@ -208,22 +213,24 @@ function init_parameters() {
     time.x = 235;
     time.w = 110;
 
-    //init_objects(   obj, ln, ofst, itr,  x,           y,    w,  h,  sw, sh,  sx,  sy )
+    //init_objects(   obj, ln, ofst, itr,  x,   y,    w,  h,  sw, sh,  sx,  sy )
     init_obj(fly, 0, 0, 1, 0, lanes[0].y, 18, 18, 18, 18, 139, 235);
-    init_obj(mlogs, 0, 49, 3, 80, lanes[1].y, 120, 25, 120, 25, 5, 197);
+    init_obj(middlesizelogs, 0, 49, 3, 80, lanes[1].y, 120, 25, 120, 25, 5, 197);
     init_obj(turtles2nos, 2, 58, 4, 0, lanes[2].y, 33, 25, 33, 25, 13, 405);
-    init_obj(llogs, 3, 84, 2, 0, lanes[3].y, 180, 25, 180, 25, 5, 166);
-    init_obj(slogs, 4, 84, 3, 50, lanes[4].y, 88, 25, 88, 25, 5, 228);
+    init_obj(largelogs, 3, 84, 2, 0, lanes[3].y, 180, 25, 180, 25, 5, 166);
+    init_obj(smallLogs, 4, 84, 3, 50, lanes[4].y, 88, 25, 88, 25, 5, 228);
     init_obj(turtles3nos, 2, 58, 4, 0, lanes[5].y, 33, 25, 33, 25, 13, 405);
     init_obj(semis, 7, 84, 2, 80, lanes[7].y, 50, 27, 50, 22, 106, 301);
     init_obj(racecars, 8, 84, 3, 50, lanes[8].y, 30, 27, 30, 27, 46, 263);
-    init_obj(pinkcars, 9, 84, 3, 30, lanes[9].y, 31, 27, 31, 24, 10, 266);
+    init_obj(pinkracecars, 9, 84, 3, 30, lanes[9].y, 31, 27, 31, 24, 10, 266);
     init_obj(tractors, 10, 84, 3, 0, lanes[10].y, 27, 27, 29, 27, 10, 301);
-    init_obj(yellowcars, 11, 84, 3, 80, lanes[11].y, 30, 27, 30, 27, 80, 263);
+    init_obj(yellowracecars, 11, 84, 3, 80, lanes[11].y, 30, 27, 30, 27, 80, 263);
     init_obj(frog, 12, 0, 1, 1, lanes[12].y, 24, 27, 24, 27, 13, 366);
 }
 
-// Initializes the parameters of objects
+
+
+// Initializes objects parameters
 function init_obj(obj, lane, offset, iterations, x, y, w, h, sw, sh, sx, sy) {
     switch (iterations) {
         case 1:
@@ -274,34 +281,34 @@ function init_obj(obj, lane, offset, iterations, x, y, w, h, sw, sh, sx, sy) {
             break;
     }
 
-    obj.lane = lane; // current lane of obj
-    obj.y = y; // obj y coord
-    obj.w = w; // obj width
-    obj.h = h; // obj height
-    obj.sw = sw; // sprite sheet width
-    obj.sh = sh; // sprite sheet height
-    obj.sx = sx; // sprite sheet x coord
-    obj.sy = sy; // sprite sheet y coord
+    obj.lane = lane;
+    obj.y = y;
+    obj.w = w;
+    obj.h = h;
+    obj.sw = sw;
+    obj.sh = sh;
+    obj.sx = sx;
+    obj.sy = sy;
 
-    obj.xbxs = x; // start of collision box in x direction
-    obj.xbse = x + w; //   end of collision box in x direction
+    obj.xbxs = x;
+    obj.xbse = x + w;
 }
 
 // in game stationary objects
 function set_board() {
-    ctx.fillStyle = "rgb(25, 25, 112)"; // color: Water-Blue
+    ctx.fillStyle = "rgb(25, 25, 112)"; // water color
     ctx.fillRect(0, 0, 399, 272); // Draw Water
-    ctx.fillStyle = "rgb(0, 0, 0)"; // color: Black
-    ctx.fillRect(0, 272, 399, 293); // Draw Street
+    ctx.fillStyle = "rgb(0, 0, 0)"; //black
+    ctx.fillRect(0, 272, 399, 293); // Street
     ctx.drawImage(sprites, 14, 13, 319, 32, 35, 10, 319, 32); // Title
     ctx.drawImage(sprites, 0, 55, 399, 56, 0, 55, 399, 56); // Grass
-    ctx.drawImage(sprites, 0, 119, 399, 35, 0, 272, 399, 35); // Upper Sidewalk
-    ctx.drawImage(sprites, 0, 119, 399, 35, 0, 474, 399, 35); // Lower Sidewalk
+    ctx.drawImage(sprites, 0, 119, 399, 35, 0, 272, 399, 35); // Sidewalk up
+    ctx.drawImage(sprites, 0, 119, 399, 35, 0, 474, 399, 35); // Sidewalk down
     update_game();
     update_text();
 }
 
-// Draws Moving Objects onto Game
+// Draws Moving Objects
 function update_game() {
     switch (lives) {
         case 4:
@@ -370,7 +377,6 @@ function update_text() {
     ctx.font = 'bold 17px sans-serif';
     ctx.textBaseline = 'bottom';
     ctx.fillText('Score: ' + score, 0, 560); // Update Score
-    //ctx.fillText('Highscore: '+ highscore, 120, 560);  // Update Highscore
 
     if (time.isactive) {
         ctx.fillRect(time.x, 545, time.w, 15);
@@ -387,6 +393,7 @@ function update_text() {
         ctx.fillText('Game Over', 125, 304); // Update GameOver
     }
 }
+
 
 // Moves frog up/down/left/right
 function move_frog(event) {
@@ -438,7 +445,7 @@ function move_frog(event) {
 }
 
 // If frog stays on an object it moves with object.
-function check_frog_pinned() {
+function check_frog_pinnedmovewith() {
     if (frog.ispinned) {
         frog.x = frog.pinnedobj[frog.pinnediter] + frog.pinnedoffset;
         set_board();
@@ -447,7 +454,9 @@ function check_frog_pinned() {
 }
 
 
-// Moves cars, logs, turtles across game at simultaneous speed which depend on the function parameter objspeed //
+
+/* Moves cars, logs, turtles across game 
+at simultaneous speed which depend on the function parameter objspeed */
 function move_cars_logs_turtles(objspeed) {
     let buffer = 60;
 
@@ -480,7 +489,7 @@ function move_cars_logs_turtles(objspeed) {
     for (i = 0; i < 3; i++) {
         for (j in logs[i].x) {
             switch (i) {
-                case 0: // Medium Logs
+                case 0: // Medium size Logs
                     for (k = 0; k < objspeed * 1; k++) {
                         logs[i].x[j] += 1;
                         if (logs[i].x[j] == board.w + buffer) {
@@ -488,7 +497,7 @@ function move_cars_logs_turtles(objspeed) {
                         }
                     }
                     break;
-                case 1: // Large Logs
+                case 1: // Large size Logs
                     for (k = 0; k < (objspeed * 3); k++) {
                         logs[i].x[j] += 1;
                         if (logs[i].x[j] == board.w + buffer) {
@@ -496,7 +505,7 @@ function move_cars_logs_turtles(objspeed) {
                         }
                     }
                     break;
-                case 2: // Small Logs
+                case 2: // Small size Logs
                     for (k = 0; k < (objspeed * 2); k++) {
                         logs[i].x[j] += 1;
                         if (logs[i].x[j] == board.w + buffer) {
@@ -513,7 +522,7 @@ function move_cars_logs_turtles(objspeed) {
     for (i = 0; i < 2; i++) {
         for (j in turtles[i].x) {
             switch (i) {
-                case 0: // Group no2 Turtles
+                case 0: // Group of 2 Turtles
                     for (k = 0; k < objspeed * 1; k++) {
                         turtles[i].x[j] -= 1;
                         if (turtles[i].x[j] == -buffer) {
@@ -521,7 +530,7 @@ function move_cars_logs_turtles(objspeed) {
                         }
                     }
                     break;
-                case 1: // Group no3 Turtles
+                case 1: // Group of 3 Turtles
                     for (k = 0; k < objspeed * 3; k++) {
                         turtles[i].x[j] -= 1;
                         if (turtles[i].x[j] == -buffer) {
@@ -552,7 +561,7 @@ function is_collision() {
 }
 
 // Returns true if the frog is in an empty slot.
-function is_safe_cross() {
+function is_safe_across() {
     if (frog.lane == 0) {
         if (frog.x > slots[0].start && (frog.x + frog.w) < slots[0].end &&
             !slots[0].isfull) {
@@ -584,6 +593,8 @@ function is_safe_cross() {
     return 1;
 }
 
+
+
 // Constructor for the slots
 function Winslot(x) {
     this.isfull = 0;
@@ -598,6 +609,8 @@ function init_win_slots() {
     slots.push(new Winslot(265));
     slots.push(new Winslot(352));
 }
+
+
 
 // Returns true if frog occupies the same space as any object from lanes 1-5
 function is_pinned() {
@@ -622,7 +635,7 @@ function is_pinned() {
                 frog.pinnedobj = logs[lane].x;
                 frog.pinnediter = log;
                 frog.pinnedoffset = frog.x - logs[lane].x[log];
-                check_frog_pinned();
+                check_frog_pinnedmovewith();
                 return 1;
             }
         }
@@ -651,7 +664,7 @@ function is_pinned() {
                 frog.pinnedobj = turtles[lane].x;
                 frog.pinnediter = i;
                 frog.pinnedoffset = frog.x - turtles[lane].x[i];
-                check_frog_pinned();
+                check_frog_pinnedmovewith();
 
                 return 1;
             }
@@ -659,6 +672,8 @@ function is_pinned() {
     }
     return 0;
 }
+
+
 
 // Returns true if the frog is in the water.
 function is_in_water() {
@@ -670,7 +685,7 @@ function is_in_water() {
     return 0;
 }
 
-// Returns true if the frog is outside the games parameter.
+// Returns true if the frog is outside the game's parameter.
 function is_out_of_bounds() {
     if (frog.x < 0 || frog.x > 380) {
         return 1;
